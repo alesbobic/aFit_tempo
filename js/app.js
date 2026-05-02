@@ -6,25 +6,46 @@ let currentRound = 1;
 let settings = {
   work: 30,
   rest: 10,
-  rounds: 8
+  rounds: 8,
+  volume: 1
 };
+
+function getBeepAudio() {
+  return document.getElementById("beepSound");
+}
+
+function unlockAudio() {
+  const audio = getBeepAudio();
+  audio.volume = settings.volume;
+
+  audio.play()
+    .then(() => {
+      audio.pause();
+      audio.currentTime = 0;
+    })
+    .catch(() => {
+      // Nekateri telefoni zahtevajo še en klik uporabnika.
+    });
+}
 
 function loadSettings() {
   const saved = localStorage.getItem("afitTempoSettings");
 
   if (saved) {
-    settings = JSON.parse(saved);
+    settings = { ...settings, ...JSON.parse(saved) };
   }
 
   document.getElementById("workInput").value = settings.work;
   document.getElementById("restInput").value = settings.rest;
   document.getElementById("roundsInput").value = settings.rounds;
+  document.getElementById("volumeInput").value = settings.volume;
 }
 
 function saveSettings() {
   settings.work = Number(document.getElementById("workInput").value);
   settings.rest = Number(document.getElementById("restInput").value);
   settings.rounds = Number(document.getElementById("roundsInput").value);
+  settings.volume = Number(document.getElementById("volumeInput").value);
 
   localStorage.setItem("afitTempoSettings", JSON.stringify(settings));
   reset();
@@ -43,37 +64,39 @@ function updateDisplay() {
   document.body.classList.toggle("rest-mode", phase === "rest");
 }
 
-/* 🔊 Osnovni pisk (z glasnostjo) */
-function beep(duration = 200, frequency = 600, volume = 0.5) {
-  const ctx = new AudioContext();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
+function playBeep(volume = settings.volume) {
+  const originalAudio = getBeepAudio();
 
-  osc.frequency.value = frequency;
-  osc.type = "sine";
+  const audio = originalAudio.cloneNode();
+  audio.volume = Math.max(0, Math.min(1, volume));
+  audio.currentTime = 0;
 
-  gain.gain.value = volume;
-
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc.start();
-
-  setTimeout(() => {
-    osc.stop();
-    ctx.close();
-  }, duration);
+  audio.play().catch(() => {
+    // Telefon/brskalnik je lahko v silent mode ali blokira autoplay.
+  });
 }
 
-/* 🚨 Močan alarm za konec intervala */
+function shortBeep() {
+  playBeep(settings.volume * 0.65);
+}
+
 function alarmBeep() {
-  beep(200, 800, 0.9);
-
-  setTimeout(() => beep(200, 700, 0.9), 250);
-  setTimeout(() => beep(300, 600, 1), 500);
+  playBeep(settings.volume);
+  setTimeout(() => playBeep(settings.volume), 260);
+  setTimeout(() => playBeep(settings.volume), 520);
 }
 
-/* 📳 Vibracija */
+function finalAlarm() {
+  alarmBeep();
+  setTimeout(() => alarmBeep(), 850);
+}
+
+function testSound() {
+  unlockAudio();
+  alarmBeep();
+  vibrate([100, 80, 100]);
+}
+
 function vibrate(pattern = 120) {
   if ("vibrate" in navigator) {
     navigator.vibrate(pattern);
@@ -83,20 +106,19 @@ function vibrate(pattern = 120) {
 function start() {
   if (timer) return;
 
-  beep(200, 700);
+  unlockAudio();
+  shortBeep();
   vibrate(120);
   updateDisplay();
 
   timer = setInterval(() => {
     timeLeft--;
 
-    // zadnje 3 sekunde
     if (timeLeft <= 3 && timeLeft > 0) {
-      beep(100, 900, 0.6);
+      shortBeep();
       vibrate(60);
     }
 
-    // konec intervala
     if (timeLeft <= 0) {
       alarmBeep();
       vibrate([100, 80, 100]);
@@ -141,14 +163,10 @@ function finishWorkout() {
   document.getElementById("time").textContent = "00:00";
   document.getElementById("round").textContent = "Trening zaključen";
 
-  // močnejši zaključni alarm
-  alarmBeep();
-  setTimeout(() => alarmBeep(), 600);
-
+  finalAlarm();
   vibrate([200, 100, 200, 100, 300]);
 }
 
-/* 🖥 Fullscreen */
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="sl">
 <head>
   <meta charset="UTF-8" />
@@ -43,10 +42,18 @@
       <input id="roundsInput" type="number" min="1" value="8">
     </label>
 
+    <label>
+      Glasnost zvoka
+      <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
+    </label>
+
     <button class="secondary" onclick="saveSettings()">Shrani nastavitve</button>
+    <button class="secondary" onclick="testSound()">Test zvoka</button>
     <button class="secondary" onclick="toggleFullscreen()">Fullscreen</button>
   </section>
 </main>
+
+<audio id="beepSound" src="assets/sounds/beep.mp3" preload="auto"></audio>
 
 <script src="js/app.js"></script>
 </body>

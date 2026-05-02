@@ -1,6 +1,4 @@
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -10,8 +8,12 @@ body {
   min-height: 100vh;
 }
 
+body.rest-mode {
+  background: linear-gradient(135deg, #fff7ed, #fef3c7);
+}
+
 .app {
-  width: min(420px, 100%);
+  width: min(430px, 100%);
   margin: 0 auto;
   padding: 24px;
   text-align: center;
@@ -30,7 +32,7 @@ h1 {
 
 .timer-card,
 .settings {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   border-radius: 24px;
   padding: 28px;
   margin-top: 24px;
@@ -42,6 +44,10 @@ h1 {
   font-weight: bold;
   color: #6aa6a6;
   letter-spacing: 2px;
+}
+
+body.rest-mode #phase {
+  color: #d97706;
 }
 
 #time {
@@ -82,9 +88,7 @@ button:hover {
   background: #d8f3dc;
 }
 
-.settings h2 {
-  margin-top: 0;
-}
+.settings h2 { margin-top: 0; }
 
 label {
   display: block;
