@@ -1,0 +1,103 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #f4f7f6, #eaf4f4);
+  color: #2f3e46;
+  min-height: 100vh;
+}
+
+.app {
+  width: min(420px, 100%);
+  margin: 0 auto;
+  padding: 24px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 4px;
+  color: #5f9ea0;
+  font-size: 38px;
+}
+
+.subtitle {
+  margin-top: 0;
+  color: #6b7c7c;
+}
+
+.timer-card,
+.settings {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  padding: 28px;
+  margin-top: 24px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.07);
+}
+
+#phase {
+  font-size: 22px;
+  font-weight: bold;
+  color: #6aa6a6;
+  letter-spacing: 2px;
+}
+
+#time {
+  font-size: 78px;
+  font-weight: bold;
+  margin: 12px 0;
+}
+
+#round {
+  color: #6b7c7c;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: #a8dadc;
+  color: #264653;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #8ecae6;
+}
+
+.secondary {
+  width: 100%;
+  margin-top: 10px;
+  background: #d8f3dc;
+}
+
+.settings h2 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin: 14px 0;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  border: 1px solid #dbe7e7;
+  border-radius: 12px;
+  font-size: 16px;
+}
