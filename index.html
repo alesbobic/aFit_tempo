@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>aFit tempo</title>
+
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -29,22 +31,22 @@
 
     <label>
       Delo (sekunde)
-      <input id="workInput" type="number" min="1" value="30">
+      <input id="workInput" type="number" min="1" value="30" />
     </label>
 
     <label>
       Počitek (sekunde)
-      <input id="restInput" type="number" min="1" value="10">
+      <input id="restInput" type="number" min="1" value="10" />
     </label>
 
     <label>
       Krogi
-      <input id="roundsInput" type="number" min="1" value="8">
+      <input id="roundsInput" type="number" min="1" value="8" />
     </label>
 
     <label>
       Glasnost zvoka
-      <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
+      <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1" />
     </label>
 
     <button class="secondary" onclick="saveSettings()">Shrani nastavitve</button>
@@ -53,7 +55,9 @@
   </section>
 </main>
 
-<audio id="beepSound" src="assets/sounds/beep.mp3" preload="auto"></audio>
+<audio id="workSound" src="assets/sounds/go.wav" preload="auto"></audio>
+<audio id="restSound" src="assets/sounds/rest.wav" preload="auto"></audio>
+<audio id="endSound" src="assets/sounds/finish.wav" preload="auto"></audio>
 
 <script src="js/app.js"></script>
 </body>
