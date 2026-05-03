@@ -6,49 +6,37 @@ let currentRound = 1;
 let settings = {
   work: 30,
   rest: 10,
-  rounds: 8,
-  volume: 1
+  rounds: 8
 };
 
-function getBeepAudio() {
-  return document.getElementById("beepSound");
-}
-
+/* 🔓 unlock zvoka (iPhone fix) */
 function unlockAudio() {
-  const audio = getBeepAudio();
-  audio.volume = settings.volume;
-
-  audio.play()
-    .then(() => {
-      audio.pause();
-      audio.currentTime = 0;
-    })
-    .catch(() => {
-      // Nekateri telefoni zahtevajo še en klik uporabnika.
-    });
+  document.querySelectorAll("audio").forEach(a => {
+    a.play().then(() => {
+      a.pause();
+      a.currentTime = 0;
+    }).catch(()=>{});
+  });
 }
 
-function loadSettings() {
-  const saved = localStorage.getItem("afitTempoSettings");
-
-  if (saved) {
-    settings = { ...settings, ...JSON.parse(saved) };
-  }
-
-  document.getElementById("workInput").value = settings.work;
-  document.getElementById("restInput").value = settings.rest;
-  document.getElementById("roundsInput").value = settings.rounds;
-  document.getElementById("volumeInput").value = settings.volume;
+/* 🔊 play helper */
+function play(id) {
+  const base = document.getElementById(id);
+  const a = base.cloneNode();
+  a.play().catch(()=>{});
 }
 
-function saveSettings() {
-  settings.work = Number(document.getElementById("workInput").value);
-  settings.rest = Number(document.getElementById("restInput").value);
-  settings.rounds = Number(document.getElementById("roundsInput").value);
-  settings.volume = Number(document.getElementById("volumeInput").value);
+/* 🎵 zvoki */
+function soundWork() { play("workSound"); }
+function soundRest() { play("restSound"); }
+function soundEnd() { play("endSound"); }
 
-  localStorage.setItem("afitTempoSettings", JSON.stringify(settings));
-  reset();
+/* test */
+function testSound() {
+  unlockAudio();
+  soundWork();
+  setTimeout(soundRest, 400);
+  setTimeout(soundEnd, 900);
 }
 
 function updateDisplay() {
@@ -60,72 +48,24 @@ function updateDisplay() {
     phase === "work" ? "DELO" : "POČITEK";
   document.getElementById("round").textContent =
     `Krog ${currentRound} / ${settings.rounds}`;
-
-  document.body.classList.toggle("rest-mode", phase === "rest");
-}
-
-function playBeep(volume = settings.volume) {
-  const originalAudio = getBeepAudio();
-
-  const audio = originalAudio.cloneNode();
-  audio.volume = Math.max(0, Math.min(1, volume));
-  audio.currentTime = 0;
-
-  audio.play().catch(() => {
-    // Telefon/brskalnik je lahko v silent mode ali blokira autoplay.
-  });
-}
-
-function shortBeep() {
-  playBeep(settings.volume * 0.65);
-}
-
-function alarmBeep() {
-  playBeep(settings.volume);
-  setTimeout(() => playBeep(settings.volume), 260);
-  setTimeout(() => playBeep(settings.volume), 520);
-}
-
-function finalAlarm() {
-  alarmBeep();
-  setTimeout(() => alarmBeep(), 850);
-}
-
-function testSound() {
-  unlockAudio();
-  alarmBeep();
-  vibrate([100, 80, 100]);
-}
-
-function vibrate(pattern = 120) {
-  if ("vibrate" in navigator) {
-    navigator.vibrate(pattern);
-  }
 }
 
 function start() {
   if (timer) return;
 
   unlockAudio();
-  shortBeep();
-  vibrate(120);
-  updateDisplay();
+  soundWork();
 
   timer = setInterval(() => {
     timeLeft--;
 
-    if (timeLeft <= 3 && timeLeft > 0) {
-      shortBeep();
-      vibrate(60);
-    }
-
     if (timeLeft <= 0) {
-      alarmBeep();
-      vibrate([100, 80, 100]);
 
       if (phase === "work") {
         phase = "rest";
         timeLeft = settings.rest;
+        soundRest();
+
       } else {
         currentRound++;
 
@@ -136,6 +76,7 @@ function start() {
 
         phase = "work";
         timeLeft = settings.work;
+        soundWork();
       }
     }
 
@@ -163,8 +104,15 @@ function finishWorkout() {
   document.getElementById("time").textContent = "00:00";
   document.getElementById("round").textContent = "Trening zaključen";
 
-  finalAlarm();
-  vibrate([200, 100, 200, 100, 300]);
+  soundEnd();
+}
+
+function saveSettings() {
+  settings.work = Number(document.getElementById("workInput").value);
+  settings.rest = Number(document.getElementById("restInput").value);
+  settings.rounds = Number(document.getElementById("roundsInput").value);
+
+  reset();
 }
 
 function toggleFullscreen() {
@@ -175,5 +123,4 @@ function toggleFullscreen() {
   }
 }
 
-loadSettings();
 reset();
