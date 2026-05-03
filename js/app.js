@@ -6,37 +6,82 @@ let currentRound = 1;
 let settings = {
   work: 30,
   rest: 10,
-  rounds: 8
+  rounds: 8,
+  volume: 1
 };
 
-/* 🔓 unlock zvoka (iPhone fix) */
+function beepAudio() {
+  return document.getElementById("beepSound");
+}
+
 function unlockAudio() {
-  document.querySelectorAll("audio").forEach(a => {
-    a.play().then(() => {
-      a.pause();
-      a.currentTime = 0;
-    }).catch(()=>{});
-  });
+  const audio = beepAudio();
+  audio.volume = settings.volume;
+
+  audio.play()
+    .then(() => {
+      audio.pause();
+      audio.currentTime = 0;
+    })
+    .catch(() => {
+      // iPhone lahko zahteva še en klik ali izklop silent mode.
+    });
 }
 
-/* 🔊 play helper */
-function play(id) {
-  const base = document.getElementById(id);
-  const a = base.cloneNode();
-  a.play().catch(()=>{});
+function playBeep(volume = settings.volume) {
+  const base = beepAudio();
+  const sound = base.cloneNode();
+  sound.volume = Math.max(0, Math.min(1, volume));
+  sound.currentTime = 0;
+  sound.play().catch(() => {});
 }
 
-/* 🎵 zvoki */
-function soundWork() { play("workSound"); }
-function soundRest() { play("restSound"); }
-function soundEnd() { play("endSound"); }
+function alarmBeep() {
+  playBeep(settings.volume);
+  setTimeout(() => playBeep(settings.volume), 260);
+  setTimeout(() => playBeep(settings.volume), 520);
+}
 
-/* test */
-function testSound() {
-  unlockAudio();
-  soundWork();
-  setTimeout(soundRest, 400);
-  setTimeout(soundEnd, 900);
+function flashScreen() {
+  document.body.classList.add("flash");
+  setTimeout(() => {
+    document.body.classList.remove("flash");
+  }, 350);
+}
+
+function flashRestPeriod() {
+  flashScreen();
+  setTimeout(flashScreen, 500);
+  setTimeout(flashScreen, 1000);
+}
+
+function vibrate(pattern = 120) {
+  if ("vibrate" in navigator) {
+    navigator.vibrate(pattern);
+  }
+}
+
+function loadSettings() {
+  const saved = localStorage.getItem("afitTempoSettings");
+
+  if (saved) {
+    settings = { ...settings, ...JSON.parse(saved) };
+  }
+
+  document.getElementById("workInput").value = settings.work;
+  document.getElementById("restInput").value = settings.rest;
+  document.getElementById("roundsInput").value = settings.rounds;
+  document.getElementById("volumeInput").value = settings.volume;
+}
+
+function saveSettings() {
+  settings.work = Number(document.getElementById("workInput").value);
+  settings.rest = Number(document.getElementById("restInput").value);
+  settings.rounds = Number(document.getElementById("roundsInput").value);
+  settings.volume = Number(document.getElementById("volumeInput").value);
+
+  localStorage.setItem("afitTempoSettings", JSON.stringify(settings));
+  reset();
 }
 
 function updateDisplay() {
@@ -48,24 +93,35 @@ function updateDisplay() {
     phase === "work" ? "DELO" : "POČITEK";
   document.getElementById("round").textContent =
     `Krog ${currentRound} / ${settings.rounds}`;
+
+  document.body.classList.toggle("rest-mode", phase === "rest");
 }
 
 function start() {
   if (timer) return;
 
   unlockAudio();
-  soundWork();
+  playBeep(settings.volume);
+  vibrate(120);
+  updateDisplay();
 
   timer = setInterval(() => {
     timeLeft--;
 
+    if (timeLeft <= 3 && timeLeft > 0) {
+      playBeep(settings.volume * 0.65);
+      flashScreen();
+      vibrate(60);
+    }
+
     if (timeLeft <= 0) {
+      alarmBeep();
+      vibrate([100, 80, 100]);
 
       if (phase === "work") {
         phase = "rest";
         timeLeft = settings.rest;
-        soundRest();
-
+        flashRestPeriod();
       } else {
         currentRound++;
 
@@ -76,7 +132,7 @@ function start() {
 
         phase = "work";
         timeLeft = settings.work;
-        soundWork();
+        flashScreen();
       }
     }
 
@@ -94,6 +150,7 @@ function reset() {
   phase = "work";
   currentRound = 1;
   timeLeft = settings.work;
+  document.body.classList.remove("flash");
   updateDisplay();
 }
 
@@ -104,15 +161,17 @@ function finishWorkout() {
   document.getElementById("time").textContent = "00:00";
   document.getElementById("round").textContent = "Trening zaključen";
 
-  soundEnd();
+  alarmBeep();
+  setTimeout(alarmBeep, 900);
+  flashRestPeriod();
+  vibrate([200, 100, 200, 100, 300]);
 }
 
-function saveSettings() {
-  settings.work = Number(document.getElementById("workInput").value);
-  settings.rest = Number(document.getElementById("restInput").value);
-  settings.rounds = Number(document.getElementById("roundsInput").value);
-
-  reset();
+function testSound() {
+  unlockAudio();
+  alarmBeep();
+  flashRestPeriod();
+  vibrate([100, 80, 100]);
 }
 
 function toggleFullscreen() {
@@ -123,4 +182,5 @@ function toggleFullscreen() {
   }
 }
 
+loadSettings();
 reset();

@@ -7,53 +7,80 @@ body {
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #f4f7f6, #eaf4f4);
   color: #2f3e46;
+  min-height: 100vh;
+  transition: background 0.25s ease;
+}
+
+body.rest-mode {
+  background: linear-gradient(135deg, #fff7ed, #fef3c7);
+}
+
+body.flash {
+  background: #fff3b0 !important;
 }
 
 .app {
-  max-width: 420px;
-  margin: auto;
-  padding: 20px;
+  width: min(430px, 100%);
+  margin: 0 auto;
+  padding: 24px;
   text-align: center;
 }
 
 h1 {
+  margin-bottom: 4px;
   color: #5f9ea0;
+  font-size: 38px;
 }
 
-.timer-card {
-  background: white;
-  padding: 30px;
-  border-radius: 20px;
-  margin-top: 20px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+.subtitle {
+  margin-top: 0;
+  color: #6b7c7c;
 }
 
-#time {
-  font-size: 70px;
-  font-weight: bold;
+.timer-card,
+.settings {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 24px;
+  padding: 28px;
+  margin-top: 24px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.07);
 }
 
 #phase {
   font-size: 22px;
+  font-weight: bold;
   color: #6aa6a6;
+  letter-spacing: 2px;
+}
+
+body.rest-mode #phase {
+  color: #d97706;
+}
+
+#time {
+  font-size: 78px;
+  font-weight: bold;
+  margin: 12px 0;
 }
 
 #round {
-  margin-top: 10px;
+  color: #6b7c7c;
 }
 
 .controls {
-  margin-top: 20px;
   display: flex;
   gap: 10px;
+  margin-top: 22px;
 }
 
 button {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   background: #a8dadc;
+  color: #264653;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -63,25 +90,27 @@ button:hover {
 }
 
 .secondary {
-  margin-top: 10px;
   width: 100%;
+  margin-top: 10px;
   background: #d8f3dc;
 }
 
-.settings {
-  margin-top: 20px;
-  text-align: left;
+.settings h2 {
+  margin-top: 0;
 }
 
 label {
   display: block;
-  margin-top: 10px;
+  text-align: left;
+  margin: 14px 0;
+  font-weight: bold;
 }
 
 input {
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  margin-top: 6px;
+  padding: 12px;
+  border: 1px solid #dbe7e7;
+  border-radius: 12px;
+  font-size: 16px;
 }
